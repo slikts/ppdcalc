@@ -1,4 +1,4 @@
-import { inToCm, cmToIn, degreeize, percentize, pixelize, dToR } from "./util";
+import { inToCm, cmToIn, degreeize, percentize, dToR } from "./util";
 
 export const getAbsSize = (n, fov) =>
   (n * Math.sin(dToR(fov / 2))) / Math.sin(dToR(fov / 2) + dToR(90));
@@ -29,10 +29,8 @@ const update = draft => {
   const screenWidth = Math.round(
     (diagonalCm * xRes) / Math.sqrt(xRes ** 2 + yRes ** 2),
   );
-  const screenWidthIn = cmToIn(screenWidth);
   draft.screen.size.x = screenWidth;
   const screenHeight = Math.round(screenWidth / (xRes / yRes));
-  const screenHeightIn = cmToIn(screenHeight);
   draft.screen.size.y = screenHeight;
   // relativize
   const ratio = 100 / maxAbsSize;

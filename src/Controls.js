@@ -20,7 +20,7 @@ const Controls = () => {
       alignItems="stretch"
     >
       <Slider
-        label="Scene depth"
+        label="Viewing distance"
         data={state.depth}
         onChange={callbacks.setDepth}
       />
@@ -33,20 +33,24 @@ const Controls = () => {
         <FormLabel component="legend">Screen</FormLabel>
         <FormControl>
           <Slider
-            label="Elevation"
+            label="Screen elevation"
             onChange={callbacks.setElevation}
             data={state.elevation}
           />
         </FormControl>
         <FormControl>
           <Slider
-            label="Diagonal"
+            label="Screen diagonal"
             data={state.diagonal}
             onChange={callbacks.setDiagonal}
           />
         </FormControl>
         <FormControl>
-          <Slider label="FOV" data={state.fov} onChange={callbacks.setFOV} />
+          <Slider
+            label="Field of view"
+            data={state.fov}
+            onChange={callbacks.setFOV}
+          />
         </FormControl>
       </FormControl>
       <Resolution presets={state.screen.presets} {...state.screen.resolution} />

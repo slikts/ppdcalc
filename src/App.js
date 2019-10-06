@@ -79,6 +79,7 @@ const initialState = produce(
       value: 140,
       range: [45, 160],
       step: 1,
+      units: "°",
     },
     relative: {
       elevation: NaN,
