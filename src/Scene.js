@@ -10,7 +10,6 @@ import Viewpoint from "./Viewpoint";
 const Scene = () => {
   const { maxAbsSize, scene, screen, rowData, viewpoint } = useStateContext();
   const segments = Math.ceil(maxAbsSize / 2 / 100) * 10 + 1;
-  console.log(screen.viewpointMeasureInverse);
   return (
     <React.Fragment>
       <div className={styles.Scene} style={cssize(scene.vars)}>

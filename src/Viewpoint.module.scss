@@ -19,18 +19,6 @@ $color: #f06;
   border-radius: 100px;
   --dots: 5px;
   color: $color;
-  // &:before {
-  //   content: " ";
-  //   position: absolute;
-  //   width: var(--dots);
-  //   height: var(--dots);
-  //   background: var(--color);
-  //   border-radius: 100px;
-  //   top: 0;
-  //   left: calc(var(--size) * -1);
-  //   left: -1px;
-  //   transform: translate(-50%);
-  // }
   background: linear-gradient(0deg, $color 0%, transparentize($color, 1) 100%);
   &.inverse {
     background: linear-gradient(
