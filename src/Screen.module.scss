@@ -1,0 +1,11 @@
+.Screen {
+  background: #000;
+  width: var(--width);
+  padding-top: var(--height);
+  position: absolute;
+  transform: translate(-50%);
+  left: 50%;
+  bottom: 50%;
+  margin-bottom: var(--elevation);
+  border-radius: 3px;
+}

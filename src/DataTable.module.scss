@@ -1,0 +1,6 @@
+.DataTable {
+  position: absolute;
+  --offset: 10px;
+  right: var(--offset);
+  top: var(--offset);
+}

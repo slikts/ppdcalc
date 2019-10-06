@@ -1,0 +1,82 @@
+.Scene {
+  padding-top: calc(100% / var(--aspectRatio));
+  position: relative;
+  overflow: hidden;
+  &:after {
+    content: " ";
+    position: absolute;
+    --size: 0.5%;
+    --left: calc(var(--size) / var(--aspectRatio));
+    top: calc(50% + var(--size) / -2);
+    left: calc(50% + var(--left) / -2);
+    background: #f06;
+    height: var(--size);
+    width: var(--left);
+    border-radius: 100px;
+  }
+}
+
+.container {
+  position: absolute;
+  background: #6f0;
+  width: var(--containerWidth);
+  height: var(--containerHeight);
+  margin-left: calc(((100% * var(--zoom)) - 100%) / -2);
+  margin-top: calc(((100% * var(--zoom)) - 100% / var(--aspectRatio)) / -2);
+  top: 0;
+
+  --secondary: rgba(255, 255, 255, 0.25);
+  background-size: var(--tileSize) var(--tileSize);
+  background-position: 50% 50%;
+  background-image: -webkit-linear-gradient(
+      45deg,
+      var(--secondary) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--secondary) 75%,
+      var(--secondary)
+    ),
+    -webkit-linear-gradient(-45deg, var(--secondary) 25%, transparent 25%, transparent
+          75%, var(--secondary) 75%, var(--secondary));
+  background-image: -moz-linear-gradient(
+      45deg,
+      var(--secondary) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--secondary) 75%,
+      var(--secondary)
+    ),
+    -moz-linear-gradient(-45deg, var(--secondary) 25%, transparent 25%, transparent
+          75%, var(--secondary) 75%, var(--secondary));
+  background-image: linear-gradient(
+      45deg,
+      var(--secondary) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--secondary) 75%,
+      var(--secondary)
+    ),
+    linear-gradient(
+      135deg,
+      var(--secondary) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--secondary) 75%,
+      var(--secondary)
+    );
+}
+
+.subcontainer {
+  position: absolute;
+  top: var(--viewpointOffset);
+  height: 100%;
+  width: 100%;
+}
+
+.ground {
+  position: absolute;
+  bottom: 0;
+  height: 50%;
+  background: rgba(0, 0, 128, 0.5);
+  width: 100%;
+}
