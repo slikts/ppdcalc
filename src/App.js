@@ -94,7 +94,7 @@ const initialState = produce(
     },
     diagonal: {
       value: 65,
-      range: [10, 88],
+      range: [5, 100],
       units: "in",
     },
     depth: {
@@ -108,6 +108,9 @@ const initialState = produce(
       range: [0, 200],
       step: 10,
       units: "cm",
+      vars: {
+        top: null,
+      },
     },
     scene: {
       absSize: NaN,
@@ -144,6 +147,8 @@ const initialState = produce(
         width: null,
         height: null,
       },
+      viewpointMeasureHeight: null,
+      viewpointMeasureInverse: null,
     },
     rowData: {
       degree: {

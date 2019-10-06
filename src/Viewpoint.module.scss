@@ -1,0 +1,51 @@
+$color: #f06;
+.Viewpoint {
+  content: " ";
+  position: absolute;
+  --size: 3px;
+  bottom: 50%;
+  left: 50%;
+  margin-left: calc(var(--size) / -2);
+  &:not(.inverse) {
+    margin-bottom: var(--offset);
+    .icon {
+      bottom: calc(var(--size) / -2);
+      transform: translate(-50%, 50%);
+    }
+  }
+  height: var(--height);
+  width: var(--size);
+  min-width: 3px;
+  border-radius: 100px;
+  --dots: 5px;
+  color: $color;
+  // &:before {
+  //   content: " ";
+  //   position: absolute;
+  //   width: var(--dots);
+  //   height: var(--dots);
+  //   background: var(--color);
+  //   border-radius: 100px;
+  //   top: 0;
+  //   left: calc(var(--size) * -1);
+  //   left: -1px;
+  //   transform: translate(-50%);
+  // }
+  background: linear-gradient(0deg, $color 0%, transparentize($color, 1) 100%);
+  &.inverse {
+    background: linear-gradient(
+      0deg,
+      transparentize($color, 1) 0%,
+      $color 100%
+    );
+    margin-bottom: var(--offset);
+    .icon {
+      transform: translate(-50%, -50%);
+      top: calc(var(--size) / 2);
+    }
+  }
+  .icon {
+    margin-left: calc(var(--size) / 2);
+    position: absolute;
+  }
+}

@@ -18,6 +18,7 @@ export const cssize = o => mapObject(o, ([k, v]) => [`--${k}`, v]);
 
 export const degreeize = n => `${n}°`;
 export const percentize = n => `${n}%`;
+export const pixelize = n => `${n}px`;
 
 export const serialize = state =>
   dataKeys

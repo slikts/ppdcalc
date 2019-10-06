@@ -2,18 +2,6 @@
   padding-top: calc(100% / var(--aspectRatio));
   position: relative;
   overflow: hidden;
-  &:after {
-    content: " ";
-    position: absolute;
-    --size: 0.5%;
-    --left: calc(var(--size) / var(--aspectRatio));
-    top: calc(50% + var(--size) / -2);
-    left: calc(50% + var(--left) / -2);
-    background: #f06;
-    height: var(--size);
-    width: var(--left);
-    border-radius: 100px;
-  }
 }
 
 .container {
@@ -24,10 +12,16 @@
   margin-left: calc(((100% * var(--zoom)) - 100%) / -2);
   margin-top: calc(((100% * var(--zoom)) - 100% / var(--aspectRatio)) / -2);
   top: 0;
-
   --secondary: rgba(255, 255, 255, 0.25);
+}
+
+.subcontainer {
+  position: absolute;
+  top: var(--viewpointOffset);
+  height: 100%;
+  width: 100%;
   background-size: var(--tileSize) var(--tileSize);
-  background-position: 50% 50%;
+  background-position: 50% calc(50%);
   background-image: -webkit-linear-gradient(
       45deg,
       var(--secondary) 25%,
@@ -64,13 +58,6 @@
       var(--secondary) 75%,
       var(--secondary)
     );
-}
-
-.subcontainer {
-  position: absolute;
-  top: var(--viewpointOffset);
-  height: 100%;
-  width: 100%;
 }
 
 .ground {

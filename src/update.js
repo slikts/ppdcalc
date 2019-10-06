@@ -1,4 +1,4 @@
-import { inToCm, cmToIn, degreeize, percentize, dToR } from "./util";
+import { inToCm, cmToIn, degreeize, percentize, pixelize, dToR } from "./util";
 
 export const getAbsSize = (n, fov) =>
   (n * Math.sin(dToR(fov / 2))) / Math.sin(dToR(fov / 2) + dToR(90));
@@ -63,26 +63,28 @@ const update = draft => {
   // const botAngle = getDeg(elevation - viewpointOffset, depth);
   rowData.degree.value = degreeize(Math.round(centerAngle));
   const ppi = Math.round(Math.hypot(xRes, yRes) / diagonalIn);
+  const angleDistance = Math.hypot(centerPoint, depth);
   rowData.ppi.value = ppi;
   // const angle = Math.abs(
   //   topAngle > botAngle ? topAngle - botAngle : botAngle - topAngle,
   // );
-  console.log({
-    width: screenWidthIn,
-    screenHeightIn,
-    diagonal: diagonalIn,
-    depth: cmToIn(depth),
-  });
   const ppd =
     xRes /
     2 /
     ((180 / Math.PI) *
       Math.atan(
         ((diagonalIn / Math.sqrt(xRes ** 2 + yRes ** 2)) * (xRes / 2)) /
-          cmToIn(depth),
+          cmToIn(angleDistance),
       ));
   rowData.ppd.value = Math.round(ppd * 10) / 10;
-  // console.log(angle);
+  // viewpoint measure
+  const viewpointMeasureHeight = elevation + screenHeight / 2 - viewpointOffset;
+  draft.viewpoint.height = viewpointMeasureHeight * ratio;
+  draft.viewpoint.vars.offset = percentize(
+    viewpointMeasureHeight < 0
+      ? (elevation + screenHeight / 2) * ratio
+      : viewpointOffset * ratio,
+  );
 };
 
 export default update;

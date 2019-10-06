@@ -5,10 +5,12 @@ import { useStateContext } from "./state";
 import { cssize } from "./util";
 import Ruler from "./Ruler";
 import DataTable from "./DataTable";
+import Viewpoint from "./Viewpoint";
 
 const Scene = () => {
-  const { maxAbsSize, scene, screen, rowData } = useStateContext();
+  const { maxAbsSize, scene, screen, rowData, viewpoint } = useStateContext();
   const segments = Math.ceil(maxAbsSize / 2 / 100) * 10 + 1;
+  console.log(screen.viewpointMeasureInverse);
   return (
     <React.Fragment>
       <div className={styles.Scene} style={cssize(scene.vars)}>
@@ -17,6 +19,7 @@ const Scene = () => {
             <div className={styles.ground}></div>
             <Screen vars={screen.vars} />
             <Ruler segments={segments} />
+            <Viewpoint vars={viewpoint.vars} height={viewpoint.height} />
           </div>
         </div>
       </div>

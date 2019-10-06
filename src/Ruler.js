@@ -1,6 +1,8 @@
 import React from "react";
 import styles from "./Ruler.module.scss";
 import { cssize } from "./util";
+import ScalePerson from "./ScalePerson";
+import ScaleBanana from "./ScaleBanana";
 
 const Ruler = ({ segments }) => {
   const children = Array.from({ length: segments }, (_, i) => (
@@ -13,6 +15,12 @@ const Ruler = ({ segments }) => {
   return (
     <div className={styles.Ruler} style={cssize({ segments })}>
       {children}
+      <div className={styles.person}>
+        <ScalePerson />
+        <div className={styles.banana}>
+          <ScaleBanana />
+        </div>
+      </div>
     </div>
   );
 };

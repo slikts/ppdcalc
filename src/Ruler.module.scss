@@ -13,7 +13,7 @@
 .segment {
   flex-grow: 1;
   border-style: solid none none solid;
-  --color: #000;
+  --color: #111;
   border-color: var(--color);
   color: var(--color);
   border-width: 1px;
@@ -34,4 +34,31 @@
       transform: translateY(-60%);
     }
   }
+}
+
+.person {
+  position: absolute;
+  bottom: 0;
+  left: 65px;
+  // width: 40%;
+  height: calc(100% / var(--segments) * 17);
+  svg {
+    height: 100%;
+    // width: 100%;
+    // width: 95px;
+    $color: #06f;
+    fill: transparentize($color, 0.25);
+    // fill: #f60;
+    fill: $color;
+    display: block;
+  }
+}
+.banana {
+  svg {
+    fill: #f7ca18;
+  }
+  position: absolute;
+  right: -8%;
+  bottom: 40%;
+  width: 25%;
 }
