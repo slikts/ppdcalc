@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import { dataKeys } from "./update";
+import update, { dataKeys } from "./update";
 
 export const strip = s => btoa(s).replace(/=/g, "");
 
@@ -20,36 +20,53 @@ export const degreeize = n => `${n}°`;
 export const percentize = n => `${n}%`;
 export const pixelize = n => `${n}px`;
 
-export const serialize = state =>
-  dataKeys
+export const getPersistent = state => {
+  const { x, y } = state.screen.resolution;
+  return dataKeys
     .map(k => [k, state[k].value])
+    .concat(Object.entries({ x, y }));
+};
+export const serialize = state => {
+  return getPersistent(state)
     .map(kv => kv.join(":"))
     .join(",");
+};
 
-export const unserialize = (baseState, update, hash = window.location.hash) => {
-  const data = hash
-    .slice(1)
-    .split(",")
-    .filter(Boolean)
-    .map(x => x.split(":").map(s => s.trim()));
+export const applyUnserialized = (state, draft) => {
+  dataKeys.forEach(k => {
+    if (!state[k]) {
+      return;
+    }
+    draft[k].value = Number(state[k]);
+  });
+  const { x, y } = state;
+  if (x) {
+    draft.screen.resolution.x = x;
+  }
+  if (y) {
+    draft.screen.resolution.y = y;
+  }
+  update(draft);
+};
+export const unserialize = (baseState, hash = window.location.hash) => {
+  const state = Object.fromEntries(
+    hash
+      .slice(1)
+      .split(",")
+      .filter(Boolean)
+      .map(x => x.split(":").map(s => s.trim())),
+  );
 
   return produce(baseState, draft => {
-    data.forEach(([k, v]) => {
-      if (!v || !dataKeys.includes(k)) {
-        return;
-      }
-      draft[k].value = Number(v);
-    });
-    update(draft);
+    applyUnserialized(state, draft);
   });
 };
 
 export const dToR = d => d * (Math.PI / 180);
 
-export const removeHash = () => {
-  window.history.pushState(
-    "",
-    document.title,
-    window.location.pathname + window.location.search,
-  );
+export const clearHash = (
+  history = window.history,
+  location = window.location,
+) => {
+  history.pushState("", document.title, location.pathname + location.search);
 };

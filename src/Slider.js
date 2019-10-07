@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Input from "@material-ui/core/Input";
 import { strip, clamp } from "./util";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import AspectRatioIcon from "@material-ui/icons/AspectRatio";
 
 const Slider = ({
   label,
@@ -14,37 +15,28 @@ const Slider = ({
     value,
     range: [min, max],
     step = 1,
-    units = null
-  }
+    units = null,
+  },
+  icon,
 }) => {
-  // const handleSliderChange = (event, newValue) => {
-  //   setValue(newValue);
-  // };
-
-  // const handleInputChange = event => {
-  //   setValue(event.target.value === "" ? "" : Number(event.target.value));
-  // };
-
-  // const handleBlur = () => {
-  //   if (value < 0) {
-  //     setValue(0);
-  //   } else if (value > 100) {
-  //     setValue(100);
-  //   }
-  // };
-
   const handleSliderChange = useCallback(
-    (_, value) => {
-      onChange(clamp(value, min, max));
+    (_, newValue) => {
+      if (value === newValue) {
+        return;
+      }
+      onChange(clamp(newValue, min, max));
     },
-    [max, min, onChange]
+    [max, min, onChange, value],
   );
 
   const handleInputChange = useCallback(
-    ({ target: { value } }) => {
-      onChange(clamp(value, min, max));
+    ({ target: { value: newValue } }) => {
+      if (value === newValue) {
+        return;
+      }
+      onChange(clamp(newValue, min, max));
     },
-    [max, min, onChange]
+    [max, min, onChange, value],
   );
 
   const id = `input-${strip(label)}`;
@@ -55,6 +47,7 @@ const Slider = ({
         {label}
       </Typography>
       <Grid container spacing={2} alignItems="center">
+        {icon && <Grid item>{icon}</Grid>}
         <Grid item xs>
           <MaterialSlider
             step={step}
@@ -77,7 +70,7 @@ const Slider = ({
               min,
               max,
               type: "number",
-              "aria-labelledby": id
+              "aria-labelledby": id,
             }}
             endAdornment={
               units ? (

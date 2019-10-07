@@ -9,12 +9,14 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { optionalLabel } from "./util";
+import ViewComfyIcon from "@material-ui/icons/ViewComfy";
+import Grid from "@material-ui/core/Grid";
 
 const inputProps = {
   min: 768,
   max: 7680,
   step: 8,
-  type: "number"
+  type: "number",
 };
 const Resolution = ({ presets, x, y }) => {
   const callbacks = useCallbackContext();
@@ -22,13 +24,13 @@ const Resolution = ({ presets, x, y }) => {
     ({ target: { value } }) => {
       callbacks.setScreenResX(value);
     },
-    [callbacks]
+    [callbacks],
   );
   const handleInputChangeY = useCallback(
     ({ target: { value } }) => {
       callbacks.setScreenResY(value);
     },
-    [callbacks]
+    [callbacks],
   );
   const handleSelectChange = useCallback(
     (_, { key }) => {
@@ -36,41 +38,48 @@ const Resolution = ({ presets, x, y }) => {
       callbacks.setScreenResX(x);
       callbacks.setScreenResY(y);
     },
-    [callbacks]
+    [callbacks],
   );
   const items = useMemo(
     () =>
       [...presets].map(([k, v]) => (
         <MenuItem key={k} value={k}>
-          {optionalLabel(k, v.label)}
+          {optionalLabel(`${v.x}×${v.y}`, v.label)}
         </MenuItem>
       )),
-    [presets]
+    [presets],
   );
   const key = `${x}x${y}`;
   return (
     <FormControl component="fieldset">
       <FormLabel component="legend">Resolution</FormLabel>
-      <div>
-        <FormControl>
-          <Input
-            value={x}
-            inputProps={inputProps}
-            endAdornment={<InputAdornment position="end">px</InputAdornment>}
-            onChange={handleInputChangeX}
-          />
-          <FormHelperText>Width</FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Input
-            value={y}
-            inputProps={inputProps}
-            endAdornment={<InputAdornment position="end">px</InputAdornment>}
-            onChange={handleInputChangeY}
-          />
-          <FormHelperText>Height</FormHelperText>
-        </FormControl>
-      </div>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <ViewComfyIcon />
+        </Grid>
+        <Grid item>
+          <FormControl>
+            <Input
+              value={x}
+              inputProps={inputProps}
+              endAdornment={<InputAdornment position="end">px</InputAdornment>}
+              onChange={handleInputChangeX}
+            />
+            <FormHelperText>Width</FormHelperText>
+          </FormControl>
+        </Grid>
+        <Grid item>
+          <FormControl>
+            <Input
+              value={y}
+              inputProps={inputProps}
+              endAdornment={<InputAdornment position="end">px</InputAdornment>}
+              onChange={handleInputChangeY}
+            />
+            <FormHelperText>Height</FormHelperText>
+          </FormControl>
+        </Grid>
+      </Grid>
       <FormControl>
         <InputLabel htmlFor="age-simple">Preset</InputLabel>
         <Select

@@ -13,7 +13,8 @@ import Controls from "./Controls";
 import { Provider } from "./state";
 import { produce } from "immer";
 import update from "./update";
-import { unserialize, serialize, removeHash } from "./util";
+import { unserialize, serialize, clearHash, applyUnserialized } from "./util";
+import Presets from "./Presets";
 
 // export const useStyles = makeStyles(theme => ({}));
 
@@ -23,50 +24,61 @@ const theme = createMuiTheme({
   },
 });
 
-const persist = (state, location = window.location) => {
-  location.hash = serialize(state);
+const persist = (state, history = window.history) => {
+  const hash = serialize(state);
+  if (hash && hash !== initialHash) {
+    history.replaceState(undefined, undefined, `#${hash}`);
+  } else {
+    clearHash();
+  }
 };
 const persistUpdate = state => {
   update(state);
   persist(state);
 };
 
-const methods = state => ({
+const methods = draft => ({
   reset() {
-    removeHash();
+    clearHash();
     return initialState;
   },
   setDepth(value) {
-    state.depth.value = value;
-    persistUpdate(state);
+    draft.depth.value = value;
+    persistUpdate(draft);
   },
-  setDiagonal(value, persist = true) {
-    state.diagonal.value = value;
-    if (persist) {
-      persistUpdate(state);
-    } else {
-      update(state);
-    }
+  setDiagonal(value) {
+    draft.diagonal.value = value;
+    persistUpdate(draft);
   },
   setElevation(value) {
-    state.elevation.value = value;
-    persistUpdate(state);
+    draft.elevation.value = value;
+    persistUpdate(draft);
   },
   setViewpoint(value) {
-    state.viewpoint.value = value;
-    persistUpdate(state);
+    draft.viewpoint.value = value;
+    persistUpdate(draft);
   },
   setScreenResX(value) {
-    state.screen.resolution.x = value;
-    persistUpdate(state);
+    draft.screen.resolution.x = value;
+    persistUpdate(draft);
   },
   setScreenResY(value) {
-    state.screen.resolution.y = value;
-    persistUpdate(state);
+    draft.screen.resolution.y = value;
+    persistUpdate(draft);
   },
   setFOV(value) {
-    state.fov.value = value;
-    persistUpdate(state);
+    draft.fov.value = value;
+    persistUpdate(draft);
+  },
+  apply(state) {
+    applyUnserialized(state, draft);
+    persistUpdate(draft);
+  },
+  align() {
+    const elevation =
+      Math.round((draft.elevation.value + draft.screen.size.y) * 10) / 10 - 6;
+    this.setViewpoint(elevation);
+    persistUpdate(draft);
   },
 });
 
@@ -95,7 +107,7 @@ const initialState = produce(
     },
     diagonal: {
       value: 65,
-      range: [5, 100],
+      range: [5, 150],
       units: "in",
     },
     depth: {
@@ -107,7 +119,7 @@ const initialState = produce(
     viewpoint: {
       value: 150,
       range: [0, 200],
-      step: 10,
+      step: 5,
       units: "cm",
       vars: {
         top: null,
@@ -129,13 +141,14 @@ const initialState = produce(
         y: 2160,
       },
       presets: [
-        [1280, 720, "HD"],
+        [1366, 720, "HD"],
         [1920, 1080, "FHD"],
-        [1920, 1200],
         [2560, 1440, "QHD"],
-        [3840, 1440],
+        [3840, 1440, "UWQHD"],
         [3840, 2160, "4K UHD"],
-        [7680, 4320, "8K UHD"],
+        [5120, 2160, "WUHD"],
+        [5120, 2880, "5K UHD"],
+        [7680, 4320, "8K FUHD"],
       ].reduce(
         (m, [x, y, label = null]) => m.set(`${x}x${y}`, { x, y, label }),
         new Map(),
@@ -166,13 +179,11 @@ const initialState = produce(
       },
     },
   },
-  draft => {
-    const init = methods(draft);
-    init.setDiagonal(draft.diagonal.value, false);
-  },
+  update,
 );
 
-const persistedState = unserialize(initialState, update);
+const initialHash = serialize(initialState);
+const persistedState = unserialize(initialState);
 
 const App = () => (
   <ThemeProvider theme={theme}>
@@ -184,6 +195,7 @@ const App = () => (
         </main>
         <div>
           <Controls />
+          <Presets />
         </div>
       </div>
     </Provider>

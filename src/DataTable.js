@@ -5,7 +5,9 @@ import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import style from "./DataTable.module.scss";
-const SimpleTable = ({ data }) => {
+import InfoIcon from "@material-ui/icons/Info";
+
+const DataTable = ({ data }) => {
   return (
     <div className={style.DataTable}>
       <Paper>
@@ -15,6 +17,9 @@ const SimpleTable = ({ data }) => {
               <TableRow key={row.name}>
                 <TableCell component="th" scope="row">
                   {row.name}
+                </TableCell>
+                <TableCell>
+                  <InfoIcon />
                 </TableCell>
                 <TableCell align="right">{row.value}</TableCell>
               </TableRow>
@@ -26,4 +31,4 @@ const SimpleTable = ({ data }) => {
   );
 };
 
-export default React.memo(SimpleTable);
+export default React.memo(DataTable);

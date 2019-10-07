@@ -1,9 +1,8 @@
 import React from "react";
-import classNames from "classnames";
 import styles from "./Screen.module.scss";
 import { cssize } from "./util";
 
-const Screen = ({ vars, inverse }) => {
+const Screen = ({ vars }) => {
   return <div className={styles.Screen} style={cssize(vars)} />;
 };
 
