@@ -2,21 +2,29 @@ import React from "react";
 import { ThemeProvider } from "@material-ui/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-import {
-  createMuiTheme,
-  //, makeStyles
-} from "@material-ui/core/styles";
+import { createMuiTheme } from "@material-ui/core/styles";
 
-import styles from "./App.module.scss";
+// import styles from "./App.module.scss";
 import Scene from "./Scene";
 import Controls from "./Controls";
-import { Provider } from "./state";
-import { produce } from "immer";
-import update from "./update";
-import { unserialize, serialize, clearHash, applyUnserialized } from "./util";
+import { Provider } from "./providers";
+import { persistedState, methods } from "./state";
 import Presets from "./Presets";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import MenuIcon from "@material-ui/icons/Menu";
+import Grid from "@material-ui/core/Grid";
+import Drawer from "@material-ui/core/Drawer";
+import Divider from "@material-ui/core/Divider";
+import Container from "@material-ui/core/Container";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import { makeStyles } from "@material-ui/core/styles";
+import classNames from "classnames";
+import ToggleUnits from "./ToggleUnits";
 
-// export const useStyles = makeStyles(theme => ({}));
+const drawerWidth = 350;
 
 const theme = createMuiTheme({
   palette: {
@@ -24,182 +32,165 @@ const theme = createMuiTheme({
   },
 });
 
-const persist = (state, history = window.history) => {
-  const hash = serialize(state);
-  if (hash && hash !== initialHash) {
-    history.replaceState(undefined, undefined, `#${hash}`);
-  } else {
-    clearHash();
-  }
-};
-const persistUpdate = state => {
-  update(state);
-  persist(state);
-};
+const useStyles = makeStyles(theme => ({
+  root: {
+    display: "flex",
+    height: "100%",
+  },
+  toolbar: {
+    paddingRight: 24, // keep right padding when drawer closed
+  },
+  toolbarIcon: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    padding: "0 8px",
+    ...theme.mixins.toolbar,
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarShift: {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  menuButton: {
+    marginRight: 36,
+  },
+  menuButtonHidden: {
+    display: "none",
+  },
+  title: {
+    flexGrow: 1,
+  },
+  drawerPaper: {
+    position: "relative",
+    whiteSpace: "nowrap",
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    height: "100%",
+    overflow: "hidden",
+  },
+  drawerPaperClose: {
+    overflowX: "hidden",
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: 0,
+  },
+  appBarSpacer: theme.mixins.toolbar,
+  content: {
+    flexGrow: 1,
+    height: "100vh",
+    overflow: "auto",
+  },
+  container: {
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
+  },
+  paper: {
+    padding: theme.spacing(2),
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+  },
+  fixedHeight: {
+    height: 240,
+  },
+}));
 
-const methods = draft => ({
-  reset() {
-    clearHash();
-    return initialState;
-  },
-  setDepth(value) {
-    draft.depth.value = value;
-    persistUpdate(draft);
-  },
-  setDiagonal(value) {
-    draft.diagonal.value = value;
-    persistUpdate(draft);
-  },
-  setElevation(value) {
-    draft.elevation.value = value;
-    persistUpdate(draft);
-  },
-  setViewpoint(value) {
-    draft.viewpoint.value = value;
-    persistUpdate(draft);
-  },
-  setScreenResX(value) {
-    draft.screen.resolution.x = value;
-    persistUpdate(draft);
-  },
-  setScreenResY(value) {
-    draft.screen.resolution.y = value;
-    persistUpdate(draft);
-  },
-  setFOV(value) {
-    draft.fov.value = value;
-    persistUpdate(draft);
-  },
-  apply(state) {
-    applyUnserialized(state, draft);
-    persistUpdate(draft);
-  },
-  align() {
-    const elevation =
-      Math.round((draft.elevation.value + draft.screen.size.y) * 10) / 10 - 6;
-    this.setViewpoint(elevation);
-    persistUpdate(draft);
-  },
-});
+const App = () => {
+  const classes = useStyles();
+  const [open, setOpen] = React.useState(true);
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+  const fixedHeightPaper = classNames(classes.paper, classes.fixedHeight);
 
-const initialState = produce(
-  {
-    absSize: NaN,
-    maxAbsSize: NaN,
-    ratio: NaN,
-    fov: {
-      value: 140,
-      range: [45, 160],
-      step: 1,
-      units: "°",
-    },
-    relative: {
-      elevation: NaN,
-      diagonal: NaN,
-      depth: NaN,
-      viewpoint: NaN,
-    },
-    elevation: {
-      value: 75,
-      range: [0, 200],
-      step: 5,
-      units: "cm",
-    },
-    diagonal: {
-      value: 65,
-      range: [5, 150],
-      units: "in",
-    },
-    depth: {
-      value: 200,
-      range: [10, 1000],
-      step: 10,
-      units: "cm",
-    },
-    viewpoint: {
-      value: 150,
-      range: [0, 200],
-      step: 5,
-      units: "cm",
-      vars: {
-        top: null,
-      },
-    },
-    scene: {
-      absSize: NaN,
-      vars: {
-        zoom: NaN,
-        aspectRatio: 4 / 3,
-        // aspectRatio: 16 / 10,
-        // aspectRatio: 1,
-        tileSize: NaN,
-      },
-    },
-    screen: {
-      resolution: {
-        x: 3840,
-        y: 2160,
-      },
-      presets: [
-        [1366, 720, "HD"],
-        [1920, 1080, "FHD"],
-        [2560, 1440, "QHD"],
-        [3840, 1440, "UWQHD"],
-        [3840, 2160, "4K UHD"],
-        [5120, 2160, "WUHD"],
-        [5120, 2880, "5K UHD"],
-        [7680, 4320, "8K FUHD"],
-      ].reduce(
-        (m, [x, y, label = null]) => m.set(`${x}x${y}`, { x, y, label }),
-        new Map(),
-      ),
-      size: {
-        x: null,
-        y: null,
-      },
-      vars: {
-        width: null,
-        height: null,
-      },
-      viewpointMeasureHeight: null,
-      viewpointMeasureInverse: null,
-    },
-    rowData: {
-      degree: {
-        name: "Viewing angle",
-        value: null,
-      },
-      ppi: {
-        name: "PPI",
-        value: null,
-      },
-      ppd: {
-        name: "PPD",
-        value: null,
-      },
-    },
-  },
-  update,
-);
+  return (
+    <ThemeProvider theme={theme}>
+      <div className={classes.root}>
+        <CssBaseline />
+        <Provider initialState={persistedState} methods={methods}>
+          <AppBar
+            position="absolute"
+            className={classNames(classes.appBar, open && classes.appBarShift)}
+          >
+            <Toolbar className={classes.toolbar}>
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                className={classNames(
+                  classes.menuButton,
+                  open && classes.menuButtonHidden,
+                )}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                component="h1"
+                variant="h6"
+                color="inherit"
+                noWrap
+                className={classes.title}
+              >
+                PPD Calculator
+              </Typography>
+              <ToggleUnits />
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            variant="permanent"
+            classes={{
+              paper: classNames(
+                classes.drawerPaper,
+                !open && classes.drawerPaperClose,
+              ),
+            }}
+            open={open}
+          >
+            <div className={classes.toolbarIcon}>
+              <IconButton onClick={handleDrawerClose}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </div>
+            <Divider />
 
-const initialHash = serialize(initialState);
-const persistedState = unserialize(initialState);
+            <Controls />
+            <Presets />
+          </Drawer>
 
-const App = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <Provider initialState={persistedState} methods={methods}>
-      <div className={styles.App}>
-        <main className={styles.main}>
-          <Scene />
-        </main>
-        <div>
-          <Controls />
-          <Presets />
-        </div>
+          <main className={classes.content}>
+            <div className={classes.appBarSpacer} />
+            <Container maxWidth="lg" className={classes.container}>
+              <Grid container spacing={1}>
+                <Grid item xs>
+                  <Scene />
+                </Grid>
+              </Grid>
+            </Container>
+          </main>
+        </Provider>
       </div>
-    </Provider>
-  </ThemeProvider>
-);
+    </ThemeProvider>
+  );
+};
 
 export default App;

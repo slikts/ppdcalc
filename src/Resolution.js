@@ -1,9 +1,7 @@
 import React, { useMemo, useCallback } from "react";
-import { useCallbackContext } from "./state";
+import { useCallbackContext } from "./providers";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
-import Input from "@material-ui/core/Input";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
@@ -11,27 +9,14 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { optionalLabel } from "./util";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import Grid from "@material-ui/core/Grid";
+import Range from "./Range";
 
-const inputProps = {
-  min: 768,
-  max: 7680,
-  step: 8,
-  type: "number",
-};
+const min = 768;
+const max = 7680;
+const step = 8;
 const Resolution = ({ presets, x, y }) => {
   const callbacks = useCallbackContext();
-  const handleInputChangeX = useCallback(
-    ({ target: { value } }) => {
-      callbacks.setScreenResX(value);
-    },
-    [callbacks],
-  );
-  const handleInputChangeY = useCallback(
-    ({ target: { value } }) => {
-      callbacks.setScreenResY(value);
-    },
-    [callbacks],
-  );
+
   const handleSelectChange = useCallback(
     (_, { key }) => {
       const [x, y] = key.split("x").map(Number);
@@ -59,22 +44,26 @@ const Resolution = ({ presets, x, y }) => {
         </Grid>
         <Grid item>
           <FormControl>
-            <Input
+            <Range
               value={x}
-              inputProps={inputProps}
-              endAdornment={<InputAdornment position="end">px</InputAdornment>}
-              onChange={handleInputChangeX}
+              onChange={callbacks.setScreenResX}
+              min={min}
+              max={max}
+              step={step}
+              units="px"
             />
             <FormHelperText>Width</FormHelperText>
           </FormControl>
         </Grid>
         <Grid item>
           <FormControl>
-            <Input
+            <Range
               value={y}
-              inputProps={inputProps}
-              endAdornment={<InputAdornment position="end">px</InputAdornment>}
-              onChange={handleInputChangeY}
+              onChange={callbacks.setScreenResY}
+              min={min}
+              max={max}
+              step={step}
+              units="px"
             />
             <FormHelperText>Height</FormHelperText>
           </FormControl>

@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./Scene.module.scss";
 import Screen from "./Screen";
-import { useStateContext } from "./state";
+import { useStateContext } from "./providers";
 import { cssize } from "./util";
 import Ruler from "./Ruler";
 import DataTable from "./DataTable";
@@ -21,8 +21,8 @@ const Scene = () => {
             <Viewpoint vars={viewpoint.vars} height={viewpoint.height} />
           </div>
         </div>
+        <DataTable data={rowData} />
       </div>
-      <DataTable data={rowData} />
     </React.Fragment>
   );
 };

@@ -8,4 +8,7 @@
   bottom: 50%;
   margin-bottom: var(--elevation);
   border-radius: 3px;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-out;
+  transition-property: width, padding-top;
 }

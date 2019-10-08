@@ -1,0 +1,7 @@
+$color: #f06;
+.input {
+  transition: color 0.1s ease-out;
+}
+.highlight {
+  color: $color !important;
+}

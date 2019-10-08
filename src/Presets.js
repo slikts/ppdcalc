@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Presets.module.scss";
-import { useCallbackContext } from "./state";
+import { useCallbackContext } from "./providers";
 // import Grid from "@material-ui/core/Grid";
 // import Button from "@material-ui/core/Button";
 // import Icon from "@material-ui/core/Icon";
@@ -42,6 +42,12 @@ const presets = [
     diagonal: 34,
   },
   {
+    label: "LG 88BH7D-B",
+    x: 3840,
+    y: 1080,
+    diagonal: 88,
+  },
+  {
     label: '21.5" FHD',
     x: 1920,
     y: 1080,
@@ -78,12 +84,6 @@ const presets = [
     diagonal: 32,
   },
   {
-    label: "LG 88BH7D-B",
-    x: 3840,
-    y: 1080,
-    diagonal: 88,
-  },
-  {
     label: '43" UHD',
     x: 3840,
     y: 2160,
@@ -114,7 +114,7 @@ const Presets = () => {
 
   const handleApply = state => () => {
     callbacks.apply(state);
-    callbacks.align();
+    // callbacks.align();
   };
   return (
     <List className={styles.Presets}>

@@ -6,6 +6,16 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import style from "./DataTable.module.scss";
 import InfoIcon from "@material-ui/icons/Info";
+import { useHighlight } from "./util";
+
+const Value = React.memo(({ children: value }) => {
+  const ref = useHighlight(value);
+  return (
+    <div ref={ref} className={style.number}>
+      {value}
+    </div>
+  );
+});
 
 const DataTable = ({ data }) => {
   return (
@@ -21,7 +31,9 @@ const DataTable = ({ data }) => {
                 <TableCell>
                   <InfoIcon />
                 </TableCell>
-                <TableCell align="right">{row.value}</TableCell>
+                <TableCell align="right">
+                  <Value>{row.value}</Value>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

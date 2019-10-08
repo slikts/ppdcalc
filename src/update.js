@@ -83,6 +83,12 @@ const update = draft => {
       ? (elevation + screenHeight / 2) * ratio
       : viewpointOffset * ratio,
   );
+  // units
+  const { units } = draft;
+  console.log(units);
+  draft.viewpoint.units = units;
+  draft.depth.units = units;
+  draft.elevation.units = units;
 };
 
 export default update;

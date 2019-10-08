@@ -1,82 +1,77 @@
 import React, { useCallback } from "react";
-import styles from "./Slider.module.scss";
+// import styles from "./Slider.module.scss";
 import Typography from "@material-ui/core/Typography";
 import MaterialSlider from "@material-ui/core/Slider";
 import Grid from "@material-ui/core/Grid";
-import Input from "@material-ui/core/Input";
-import { strip, clamp } from "./util";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import AspectRatioIcon from "@material-ui/icons/AspectRatio";
+import { strip, clamp, cmToIn, inToCm } from "./util";
+import FormLabel from "@material-ui/core/FormLabel";
+import Range from "./Range";
 
+const round = n => Math.round(cmToIn(n) * 10) / 10;
 const Slider = ({
   label,
   onChange,
   data: {
-    value,
+    value: origValue,
     range: [min, max],
     step = 1,
-    units = null,
+    units,
+    origUnits,
   },
   icon,
 }) => {
+  const id = `input-${strip(label)}`;
+  const isConverted = units === "in" && units !== origUnits;
+  console.log(label, isConverted, units, origUnits);
+  const value = isConverted ? round(origValue) : origValue;
+
   const handleSliderChange = useCallback(
     (_, newValue) => {
       if (value === newValue) {
         return;
       }
-      onChange(clamp(newValue, min, max));
+      onChange(
+        clamp(
+          isConverted ? Math.round(inToCm(newValue) * 10) / 10 : newValue,
+          min,
+          max,
+        ),
+      );
     },
-    [max, min, onChange, value],
+    [isConverted, max, min, onChange, value],
   );
 
-  const handleInputChange = useCallback(
-    ({ target: { value: newValue } }) => {
-      if (value === newValue) {
-        return;
-      }
-      onChange(clamp(newValue, min, max));
-    },
-    [max, min, onChange, value],
-  );
-
-  const id = `input-${strip(label)}`;
+  const unitStep = isConverted ? round(step) : step;
+  const unitMin = isConverted ? round(min) : min;
+  const unitMax = isConverted ? round(max) : max;
 
   return (
     <div>
-      <Typography id={id} gutterBottom>
-        {label}
-      </Typography>
+      <FormLabel component="legend">
+        <Typography gutterBottom>{label}</Typography>
+      </FormLabel>
       <Grid container spacing={2} alignItems="center">
         {icon && <Grid item>{icon}</Grid>}
         <Grid item xs>
           <MaterialSlider
-            step={step}
-            min={min}
-            max={max}
+            step={unitStep}
+            min={unitMin}
+            max={unitMax}
             value={value}
             onChange={handleSliderChange}
             aria-labelledby={id}
           />
         </Grid>
-        <Grid item>
-          <Input
-            className={styles.input}
+        <Grid item xs={4}>
+          <Range
             value={value}
-            margin="dense"
-            onChange={handleInputChange}
-            // onBlur={onChange}
-            inputProps={{
-              step,
-              min,
-              max,
-              type: "number",
-              "aria-labelledby": id,
-            }}
-            endAdornment={
-              units ? (
-                <InputAdornment position="end">{units}</InputAdornment>
-              ) : null
-            }
+            onChange={onChange}
+            min={unitMin}
+            max={unitMax}
+            step={unitStep}
+            id={id}
+            units={units}
+            origUnits={origUnits}
           />
         </Grid>
       </Grid>
