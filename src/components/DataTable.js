@@ -6,7 +6,7 @@ import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import style from "./DataTable.module.scss";
 import InfoIcon from "@material-ui/icons/Info";
-import { useHighlight } from "./util";
+import { useHighlight } from "../hooks";
 
 const Value = React.memo(({ children: value }) => {
   const ref = useHighlight(value);

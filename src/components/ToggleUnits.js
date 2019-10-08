@@ -1,14 +1,17 @@
 import React from "react";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import { useCallbackContext, useStateContext } from "./providers";
+import { useCallbackContext, useStateContext } from "../providers";
 
 const ToggleUnits = () => {
   const { units } = useStateContext();
   const { setUnits } = useCallbackContext();
-  const handleChange = React.useCallback((_, value) => {
-    setUnits(value);
-  }, [setUnits]);
+  const handleChange = React.useCallback(
+    (_, value) => {
+      setUnits(value);
+    },
+    [setUnits],
+  );
 
   return (
     <ToggleButtonGroup

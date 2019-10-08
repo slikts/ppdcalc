@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 import styles from "./Viewpoint.module.scss";
-import { cssize } from "./util";
+import { cssize } from "../util";
 import Icon from "@material-ui/core/Icon";
 
 const Viewpoint = ({ vars, height }) => {

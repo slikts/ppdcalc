@@ -1,41 +1,49 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import Input from "@material-ui/core/Input";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import { clamp, useHighlight, inToCm } from "./util";
+import { clamp, in2cm } from "../util";
+import { useHighlight } from "../hooks";
 
-const Range = ({
-  value,
-  onChange,
-  min,
-  max,
-  step,
-  id,
-  units,
-  onBlur,
-  origUnits,
-}) => {
+const Range = ({ value, onChange, min, max, step, id, units, origUnits }) => {
   const inputEl = useHighlight(value);
   const inches = units === "in" && units !== origUnits;
+  const [editing, setEditing] = useState(null);
 
   const handleInputChange = useCallback(
     ({ target: { value: newValue } }) => {
+      if (editing) {
+        setEditing(null);
+        return;
+      }
       if (value === newValue) {
         return;
       }
-      const clampedValue = clamp(newValue, min, max);
-      onChange(inches ? inToCm(clampedValue) : clampedValue);
+      if (newValue === "") {
+        onChange("");
+        return;
+      }
+      onChange(newValue);
     },
-    [max, min, inches, onChange, value],
+    [editing, value, onChange],
   );
+
+  const handleBlur = () => {
+    const clampedValue = clamp(value, min, max);
+    const newValue = inches ? in2cm(clampedValue) : clampedValue;
+    if (newValue === value) {
+      return;
+    }
+    onChange(newValue);
+  };
 
   return (
     <Input
       fullWidth
-      value={value}
+      value={editing || value}
       margin="dense"
       onChange={handleInputChange}
       inputRef={inputEl}
-      onBlur={onBlur}
+      onBlur={handleBlur}
       inputProps={{
         step,
         min,

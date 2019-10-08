@@ -1,14 +1,20 @@
 import React from "react";
 import styles from "./Scene.module.scss";
 import Screen from "./Screen";
-import { useStateContext } from "./providers";
-import { cssize } from "./util";
+import { useStateContext } from "../providers";
+import { cssize } from "../util";
 import Ruler from "./Ruler";
 import DataTable from "./DataTable";
 import Viewpoint from "./Viewpoint";
 
 const Scene = () => {
-  const { maxAbsSize, scene, screen, rowData, viewpoint } = useStateContext();
+  const {
+    maxAbsSize,
+    scene,
+    screen,
+    rowData,
+    sliders: { viewpoint },
+  } = useStateContext();
   const segments = Math.ceil(maxAbsSize / 2 / 100) * 10 + 1;
   return (
     <React.Fragment>

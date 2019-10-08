@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Presets.module.scss";
-import { useCallbackContext } from "./providers";
+import { useCallbackContext } from "../providers";
 // import Grid from "@material-ui/core/Grid";
 // import Button from "@material-ui/core/Button";
 // import Icon from "@material-ui/core/Icon";
@@ -14,7 +14,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 // import IconButton from "@material-ui/core/IconButton";
 // import CommentIcon from "@material-ui/icons/RemoveCircle";
 
-import { strip } from "./util";
+import { strip } from "../util";
 
 const presets = [
   {

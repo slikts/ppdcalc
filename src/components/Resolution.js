@@ -1,20 +1,25 @@
 import React, { useMemo, useCallback } from "react";
-import { useCallbackContext } from "./providers";
+import { useCallbackContext } from "../providers";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import { optionalLabel } from "./util";
+import { optionalLabel } from "../util";
 import ViewComfyIcon from "@material-ui/icons/ViewComfy";
 import Grid from "@material-ui/core/Grid";
 import Range from "./Range";
 
-const min = 768;
-const max = 7680;
-const step = 8;
-const Resolution = ({ presets, x, y }) => {
+const Resolution = ({
+  state: {
+    presets,
+    x,
+    y,
+    range: [min, max],
+    step,
+  },
+}) => {
   const callbacks = useCallbackContext();
 
   const handleSelectChange = useCallback(

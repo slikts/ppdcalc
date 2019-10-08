@@ -1,15 +1,15 @@
-import { useEffect, useRef } from "react";
 import { produce } from "immer";
-import update, { dataKeys } from "./update";
-import styles from "./common.module.scss";
+import update from "./update";
 
 export const strip = s => btoa(s).replace(/=/g, "");
 
 export const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
 
 const inCmRatio = 2.54;
-export const inToCm = n => n * inCmRatio;
-export const cmToIn = n => n / inCmRatio;
+export const in2cm = n => n * inCmRatio;
+export const cm2in = n => n / inCmRatio;
+const converters = { in2cm, cm2in };
+export const Converter = (from, to) => converters[`${from}2${to}`];
 
 export const optionalLabel = (a, b) => `${a}${b ? ` (${b})` : ""}`;
 
@@ -23,10 +23,8 @@ export const percentize = n => `${n}%`;
 export const pixelize = n => `${n}px`;
 
 export const getPersistent = state => {
-  const { x, y } = state.screen.resolution;
-  return dataKeys
-    .map(k => [k, state[k].value])
-    .concat(Object.entries({ x, y }));
+  const { x, y } = state.resolution;
+  return Object.entries(state.sliders).concat(Object.entries({ x, y }));
 };
 export const serialize = state => {
   return getPersistent(state)
@@ -34,19 +32,24 @@ export const serialize = state => {
     .join(",");
 };
 
-export const applyUnserialized = (state, draft) => {
-  dataKeys.forEach(k => {
-    if (!state[k]) {
+export const applyUnserialized = (newState, draft) => {
+  // TODO:
+  return;
+  const { sliders, screen } = draft;
+  Object.entries(sliders).forEach(([key, slider]) => {
+    const value = newState[key];
+    if (!newState[key]) {
       return;
     }
-    draft[k].value = Number(state[k]);
+    slider.value = value;
+    slider.raw.value = value;
   });
-  const { x, y } = state;
+  const { x, y } = newState;
   if (x) {
-    draft.screen.resolution.x = x;
+    screen.resolution.x = x;
   }
   if (y) {
-    draft.screen.resolution.y = y;
+    screen.resolution.y = y;
   }
   update(draft);
 };
@@ -71,25 +74,4 @@ export const clearHash = (
   location = window.location,
 ) => {
   history.pushState("", document.title, location.pathname + location.search);
-};
-
-export const useHighlight = value => {
-  const inputEl = useRef(null);
-  useEffect(() => {
-    if (!inputEl.current) {
-      return;
-    }
-    const classList = inputEl.current.classList;
-    if (classList.contains(styles.input)) {
-      classList.add(styles.highlight);
-      const timeout = setTimeout(() => {
-        classList.remove(styles.highlight);
-      }, 300);
-
-      return () => clearTimeout(timeout);
-    } else {
-      classList.add(styles.input);
-    }
-  }, [inputEl, value]);
-  return inputEl;
 };

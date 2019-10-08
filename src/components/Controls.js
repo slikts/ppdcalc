@@ -1,7 +1,7 @@
 import React from "react";
 // import styles from "./Controls.module.scss";
 import Slider from "./Slider";
-import { useStateContext, useCallbackContext } from "./providers";
+import { useStateContext, useCallbackContext } from "../providers";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Icon from "@material-ui/core/Icon";
@@ -24,6 +24,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 
 const Controls = () => {
   const state = useStateContext();
+  const { sliders } = state;
   const callbacks = useCallbackContext();
   return (
     <Grid
@@ -43,32 +44,28 @@ const Controls = () => {
           <Grid item>
             <Slider
               label="Viewing distance"
-              data={state.depth}
-              onChange={callbacks.setDepth}
+              data={sliders.depth}
               icon={<ZoomInIcon />}
             />
           </Grid>
           <Grid item>
             <Slider
               label="Viewpoint height"
-              data={state.viewpoint}
-              onChange={callbacks.setViewpoint}
+              data={sliders.viewpoint}
               icon={<VisibilityIcon />}
             />
           </Grid>
           <Grid item>
             <Slider
               label="Screen elevation"
-              onChange={callbacks.setElevation}
-              data={state.elevation}
+              data={sliders.elevation}
               icon={<HeightIcon />}
             />
           </Grid>
           <Grid item>
             <Slider
               label="Screen diagonal"
-              data={state.diagonal}
-              onChange={callbacks.setDiagonal}
+              data={sliders.diagonal}
               icon={<AspectRatioIcon />}
             />
           </Grid>
@@ -82,10 +79,7 @@ const Controls = () => {
           justify="flex-start"
           alignItems="stretch"
         >
-          <Resolution
-            presets={state.screen.presets}
-            {...state.screen.resolution}
-          />
+          <Resolution state={state.resolution} />
         </Grid>
       </Box>
       <Divider />
@@ -134,8 +128,7 @@ const Controls = () => {
           >
             <Slider
               label="Field of view"
-              data={state.fov}
-              onChange={callbacks.setFOV}
+              data={sliders.fov}
               icon={<SettingsOverscanIcon />}
             />
           </Grid>

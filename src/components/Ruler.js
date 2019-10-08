@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Ruler.module.scss";
-import { cssize } from "./util";
+import { cssize } from "../util";
 import ScalePerson from "./ScalePerson";
 import ScaleBanana from "./ScaleBanana";
 
