@@ -24,7 +24,7 @@ const baseUnits = "cm";
 export const methods = {
   methods: draft => ({
     reset() {
-      return initialState;
+      return draft.rawUnits === "in" ? initialStateIn : initialState;
     },
     setSliderValue(key, value) {
       const slider = draft.sliders[key];
@@ -60,12 +60,21 @@ export const methods = {
       }
       this.updateScene();
     },
+    setResolution(x, y) {
+      this.setRawResolution("x", x);
+      this.setRawResolution("y", y);
+      this.updateScene();
+    },
     setRawResolution(key, rawValue) {
       const { resolution } = draft;
       const [min, max] = resolution.range;
-      const value = clamp(Math.round(rawValue), min, max);
-      resolution[key] = isNaN(value) ? resolution.default[key] : value;
+      const value = rawValue === "" ? rawValue : Number(rawValue);
+      const cleanedValue = clamp(Math.round(rawValue), min, max);
+      resolution[key] = isNaN(cleanedValue)
+        ? resolution.default[key]
+        : cleanedValue;
       resolution.raw[key] = rawValue;
+      resolution.cleaned[key] = cleanedValue;
       this.updateScene();
     },
     apply(newState) {
@@ -135,6 +144,10 @@ const Resolution = ({ x, y }) => ({
   x,
   y,
   raw: {
+    x,
+    y,
+  },
+  cleaned: {
     x,
     y,
   },
@@ -247,4 +260,7 @@ const initialState = produce(
 );
 
 // const initialHash = serialize(initialState);
+const initialStateIn = produce(initialState, draft => {
+  methods.methods(draft).setRawUnits("in");
+});
 export const persistedState = unserialize(initialState);

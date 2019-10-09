@@ -14,8 +14,8 @@ import Range from "./Range";
 const Resolution = ({
   state: {
     presets,
-    x,
-    y,
+    raw: { x, y },
+    cleaned,
     range: [min, max],
     step,
   },
@@ -24,11 +24,33 @@ const Resolution = ({
 
   const handleSelectChange = useCallback(
     (_, { key }) => {
-      const [x, y] = key.split("x").map(Number);
-      callbacks.setScreenResX(x);
-      callbacks.setScreenResY(y);
+      callbacks.setResolution(...key.split("x").map(Number));
     },
     [callbacks],
+  );
+  const handleChangeX = useCallback(
+    value => {
+      callbacks.setRawResolution("x", value);
+    },
+    [callbacks],
+  );
+  const handleChangeY = useCallback(
+    value => {
+      callbacks.setRawResolution("y", value);
+    },
+    [callbacks],
+  );
+  const handleBlurX = useCallback(
+    value => {
+      callbacks.setRawResolution("x", cleaned.x);
+    },
+    [callbacks, cleaned.x],
+  );
+  const handleBlurY = useCallback(
+    value => {
+      callbacks.setRawResolution("y", cleaned.y);
+    },
+    [callbacks, cleaned.y],
   );
   const items = useMemo(
     () =>
@@ -51,7 +73,8 @@ const Resolution = ({
           <FormControl>
             <Range
               value={x}
-              onChange={callbacks.setScreenResX}
+              onChange={handleChangeX}
+              onBlur={handleBlurX}
               min={min}
               max={max}
               step={step}
@@ -64,7 +87,8 @@ const Resolution = ({
           <FormControl>
             <Range
               value={y}
-              onChange={callbacks.setScreenResY}
+              onChange={handleChangeY}
+              onBlur={handleBlurY}
               min={min}
               max={max}
               step={step}

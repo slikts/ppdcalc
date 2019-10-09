@@ -8,9 +8,12 @@ const ToggleUnits = () => {
   const { setRawUnits } = useCallbackContext();
   const handleChange = React.useCallback(
     (_, value) => {
+      if (rawUnits === value || !value) {
+        return;
+      }
       setRawUnits(value);
     },
-    [setRawUnits],
+    [rawUnits, setRawUnits],
   );
 
   return (
