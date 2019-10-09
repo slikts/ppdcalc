@@ -1,4 +1,4 @@
-import { in2cm, cm2in, degreeize, percentize, dToR } from "./util";
+import { in2cm, getPPD, degreeize, percentize, dToR } from "./util";
 
 export const getAbsSize = (n, fov) =>
   (n * Math.sin(dToR(fov / 2))) / Math.sin(dToR(fov / 2) + dToR(90));
@@ -57,14 +57,8 @@ const update = draft => {
   const ppi = Math.round(Math.hypot(xRes, yRes) / diagonalIn);
   const angleDistance = Math.hypot(centerPoint, depth);
   rowData.ppi.value = ppi;
-  const ppd =
-    xRes /
-    2 /
-    ((180 / Math.PI) *
-      Math.atan(
-        ((diagonalIn / Math.sqrt(xRes ** 2 + yRes ** 2)) * (xRes / 2)) /
-          cm2in(angleDistance),
-      ));
+  const ppd = getPPD(xRes, yRes, diagonalIn, angleDistance);
+
   rowData.ppd.value = Math.round(ppd * 10) / 10;
   // viewpoint measure
   const viewpointMeasureHeight = elevation + screenHeight / 2 - viewpoint;
@@ -74,6 +68,8 @@ const update = draft => {
       ? (elevation + screenHeight / 2) * ratio
       : viewpoint * ratio,
   );
+  // alignment
+  draft.aligned = Math.round((elevation + screenHeight) * 10) / 10 - 6;
 };
 
 export default update;

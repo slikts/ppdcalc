@@ -4,18 +4,18 @@ import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import { useCallbackContext, useStateContext } from "../providers";
 
 const ToggleUnits = () => {
-  const { units } = useStateContext();
-  const { setUnits } = useCallbackContext();
+  const { rawUnits } = useStateContext();
+  const { setRawUnits } = useCallbackContext();
   const handleChange = React.useCallback(
     (_, value) => {
-      setUnits(value);
+      setRawUnits(value);
     },
-    [setUnits],
+    [setRawUnits],
   );
 
   return (
     <ToggleButtonGroup
-      value={units}
+      value={rawUnits}
       exclusive
       onChange={handleChange}
       aria-label="text alignment"

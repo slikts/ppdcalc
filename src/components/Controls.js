@@ -17,10 +17,10 @@ import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Divider from "@material-ui/core/Divider";
 import Box from "@material-ui/core/Box";
 import Tooltip from "@material-ui/core/Tooltip";
+import styles from "../common.module.scss";
 
 const Controls = () => {
   const state = useStateContext();
@@ -45,6 +45,7 @@ const Controls = () => {
             <Slider
               label="Viewing distance"
               data={sliders.depth}
+              dataKey="depth"
               icon={<ZoomInIcon />}
             />
           </Grid>
@@ -52,6 +53,7 @@ const Controls = () => {
             <Slider
               label="Viewpoint height"
               data={sliders.viewpoint}
+              dataKey="viewpoint"
               icon={<VisibilityIcon />}
             />
           </Grid>
@@ -59,6 +61,7 @@ const Controls = () => {
             <Slider
               label="Screen elevation"
               data={sliders.elevation}
+              dataKey="elevation"
               icon={<HeightIcon />}
             />
           </Grid>
@@ -66,6 +69,7 @@ const Controls = () => {
             <Slider
               label="Screen diagonal"
               data={sliders.diagonal}
+              dataKey="diagonal"
               icon={<AspectRatioIcon />}
             />
           </Grid>
@@ -80,34 +84,6 @@ const Controls = () => {
           alignItems="stretch"
         >
           <Resolution state={state.resolution} />
-        </Grid>
-      </Box>
-      <Divider />
-      <Box p={2}>
-        <Grid container justify="center">
-          <Grid item>
-            <ButtonGroup>
-              <Button
-                variant="outlined"
-                startIcon={<Icon>refresh</Icon>}
-                onClick={callbacks.reset}
-              >
-                Reset
-              </Button>
-              <Tooltip
-                title="Align viewpoint height with screen top"
-                placement="bottom"
-              >
-                <Button
-                  variant="outlined"
-                  startIcon={<VerticalAlignTopIcon />}
-                  onClick={callbacks.align}
-                >
-                  Align
-                </Button>
-              </Tooltip>
-            </ButtonGroup>
-          </Grid>
         </Grid>
       </Box>
 
@@ -129,11 +105,48 @@ const Controls = () => {
             <Slider
               label="Field of view"
               data={sliders.fov}
+              dataKey="fov"
               icon={<SettingsOverscanIcon />}
             />
           </Grid>
         </ExpansionPanelDetails>
       </ExpansionPanel>
+      <Box p={2}>
+        <Grid container justify="center">
+          <Tooltip
+            placement="bottom"
+            title="Reset app to initial state"
+            className={styles.button}
+          >
+            <div>
+              <Button
+                variant="outlined"
+                startIcon={<Icon>refresh</Icon>}
+                onClick={callbacks.reset}
+              >
+                Reset
+              </Button>
+            </div>
+          </Tooltip>
+          <Tooltip
+            title="Align viewpoint height with the top edge of the screen"
+            placement="bottom"
+            className={styles.button}
+          >
+            <div>
+              <Button
+                disabled={state.aligned === state.sliders.viewpoint.value}
+                variant="outlined"
+                startIcon={<VerticalAlignTopIcon />}
+                onClick={callbacks.align}
+              >
+                Align
+              </Button>
+            </div>
+          </Tooltip>
+        </Grid>
+      </Box>
+      <Divider />
     </Grid>
   );
 };

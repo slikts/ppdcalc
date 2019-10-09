@@ -1,5 +1,4 @@
 import { produce } from "immer";
-import update from "./update";
 
 export const strip = s => btoa(s).replace(/=/g, "");
 
@@ -32,27 +31,6 @@ export const serialize = state => {
     .join(",");
 };
 
-export const applyUnserialized = (newState, draft) => {
-  // TODO:
-  return;
-  const { sliders, screen } = draft;
-  Object.entries(sliders).forEach(([key, slider]) => {
-    const value = newState[key];
-    if (!newState[key]) {
-      return;
-    }
-    slider.value = value;
-    slider.raw.value = value;
-  });
-  const { x, y } = newState;
-  if (x) {
-    screen.resolution.x = x;
-  }
-  if (y) {
-    screen.resolution.y = y;
-  }
-  update(draft);
-};
 export const unserialize = (baseState, hash = window.location.hash) => {
   const state = Object.fromEntries(
     hash
@@ -63,7 +41,8 @@ export const unserialize = (baseState, hash = window.location.hash) => {
   );
 
   return produce(baseState, draft => {
-    applyUnserialized(state, draft);
+    //TODO:
+    // applyUnserialized(state, draft);
   });
 };
 
@@ -75,3 +54,11 @@ export const clearHash = (
 ) => {
   history.pushState("", document.title, location.pathname + location.search);
 };
+
+export const getPPD = (x, y, diagonal, distance) =>
+  x /
+  2 /
+  ((180 / Math.PI) *
+    Math.atan(
+      ((diagonal / Math.sqrt(x ** 2 + y ** 2)) * (x / 2)) / cm2in(distance),
+    ));

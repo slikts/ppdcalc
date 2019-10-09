@@ -1,4 +1,6 @@
-#root,
+:global(#root) {
+  height: 100%;
+}
 body,
 html {
   margin: 0;

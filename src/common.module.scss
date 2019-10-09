@@ -1,0 +1,15 @@
+.button {
+  &:not(:first-child) {
+    margin-right: -1px;
+    :global(.MuiButtonBase-root) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+  &:not(:last-child) {
+    :global(.MuiButtonBase-root) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}

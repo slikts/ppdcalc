@@ -4,7 +4,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 import { createMuiTheme } from "@material-ui/core/styles";
 
-// import styles from "./App.module.scss";
+import styles from "./App.module.scss";
 import Scene from "./Scene";
 import Controls from "./Controls";
 import { Provider } from "../providers";
@@ -18,11 +18,11 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Grid from "@material-ui/core/Grid";
 import Drawer from "@material-ui/core/Drawer";
 import Divider from "@material-ui/core/Divider";
-import Container from "@material-ui/core/Container";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import ToggleUnits from "./ToggleUnits";
+import { cssize } from "../util";
 
 const drawerWidth = 350;
 
@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     height: "100%",
   },
   toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24,
   },
   toolbarIcon: {
     display: "flex",
@@ -106,9 +106,6 @@ const useStyles = makeStyles(theme => ({
     overflow: "auto",
     flexDirection: "column",
   },
-  fixedHeight: {
-    height: 240,
-  },
 }));
 
 const App = () => {
@@ -120,11 +117,10 @@ const App = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = classNames(classes.paper, classes.fixedHeight);
 
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.root}>
+      <div className={classes.root} style={cssize({ drawerWidth })}>
         <CssBaseline />
         <Provider initialState={persistedState} methods={methods}>
           <AppBar
@@ -144,15 +140,24 @@ const App = () => {
               >
                 <MenuIcon />
               </IconButton>
-              <Typography
-                component="h1"
-                variant="h6"
-                color="inherit"
-                noWrap
-                className={classes.title}
-              >
-                PPD Calculator
-              </Typography>
+              <Grid container direction="column">
+                <Grid item>
+                  <Typography
+                    component="h1"
+                    variant="h6"
+                    color="inherit"
+                    noWrap
+                    className={classes.title}
+                  >
+                    Screen Finder
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="body2" component="h2">
+                    Tool for finding the optimal screen size and resolution
+                  </Typography>
+                </Grid>
+              </Grid>
               <ToggleUnits />
             </Toolbar>
           </AppBar>
@@ -166,26 +171,36 @@ const App = () => {
             }}
             open={open}
           >
-            <div className={classes.toolbarIcon}>
-              <IconButton onClick={handleDrawerClose}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </div>
-            <Divider />
-
-            <Controls />
-            <Presets />
+            <Grid
+              container
+              className={styles.sidebar}
+              direction="column"
+              justify="flex-start"
+              // alignItems="stretch"
+              wrap="nowrap"
+            >
+              <Grid item>
+                <div className={classes.toolbarIcon}>
+                  <IconButton onClick={handleDrawerClose}>
+                    <ChevronLeftIcon />
+                  </IconButton>
+                </div>
+              </Grid>
+              <Grid item>
+                <Divider />
+              </Grid>
+              <Grid item>
+                <Controls />
+              </Grid>
+              <Grid item className={styles.presets}>
+                <Presets />
+              </Grid>
+            </Grid>
           </Drawer>
 
-          <main className={classes.content}>
+          <main className={styles.scene}>
             <div className={classes.appBarSpacer} />
-            <Container maxWidth="lg" className={classes.container}>
-              <Grid container spacing={1}>
-                <Grid item xs>
-                  <Scene />
-                </Grid>
-              </Grid>
-            </Container>
+            <Scene />
           </main>
         </Provider>
       </div>

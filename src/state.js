@@ -1,107 +1,118 @@
 import { produce } from "immer";
-import update from "./update";
-import {
-  unserialize,
-  serialize,
-  clearHash,
-  applyUnserialized,
-  clamp,
-  Converter,
-  cm2in,
-  in2cm,
-} from "./util";
+import updateScene from "./updateScene";
+import { unserialize, clamp, Converter, cm2in, in2cm } from "./util";
 
-const persist = (state, history = window.history) => {
-  const hash = serialize(state);
-  if (hash && hash !== initialHash) {
-    history.replaceState(undefined, undefined, `#${hash}`);
-  } else {
-    clearHash();
-  }
-};
-const persistUpdate = state => {
-  update(state);
-  persist(state);
-};
+// const persist = (state, history = window.history) => {
+//   const hash = serialize(state);
+//   if (hash && hash !== initialHash) {
+//     history.replaceState(undefined, undefined, `#${hash}`);
+//   } else {
+//     clearHash();
+//   }
+// };
+// TODO:
+// const persistUpdate = state => {
+//   updateScene(state);
+//   persist(state);
+// };
 
 const cleanValue = (value, [min, max]) =>
   clamp(Math.round(value * 10) / 10, min, max);
 
 const baseUnits = "cm";
 
-export const methods = draft => ({
-  reset() {
-    return initialState;
-  },
-  setSliderValue(key, value) {
-    const slider = draft.sliders[key];
-    const { raw } = slider;
-    slider.value = value;
-    const convert = Converter(slider.units, draft.rawUnits);
-    const rawValue = convert ? convert(value) : value;
-    raw.value = rawValue;
-    raw.cleanedValue = rawValue;
-    raw.defaultValue = rawValue;
-  },
-  resetSlider(key) {
-    this.setSliderValue(key, draft.sliders[key].defaultValue);
-  },
-  setRawSliderValue(key, rawValue) {
-    const slider = draft.sliders[key];
-    const { raw } = slider;
-    raw.value = rawValue;
-    const cleanedValue = cleanValue(rawValue, raw.range);
-    const isConvertible = slider.units === baseUnits && draft.rawUnits === "in";
-    if (isNaN(cleanedValue)) {
-      raw.cleanedValue = isConvertible ? cm2in(slider.default) : slider.default;
-      slider.value = slider.default;
-    } else {
-      raw.cleanedValue = cleanedValue;
-      slider.value = isConvertible ? in2cm(cleanedValue) : cleanedValue;
-    }
-  },
-  setRawResolution(key, rawValue) {
-    const { resolution } = draft;
-    const [min, max] = resolution.range;
-    const value = clamp(Math.round(rawValue), min, max);
-    resolution[key] = isNaN(value) ? resolution.default[key] : value;
-    resolution.raw[key] = rawValue;
-  },
-  apply(state) {
-    // TODO:
-    applyUnserialized(state, draft);
-  },
-  align() {
-    const elevation =
-      Math.round((draft.elevation.value + draft.screen.size.y) * 10) / 10 - 6;
-    this.setSliderValue("elevation", elevation);
-  },
-  setRawUnits(units) {
-    const convert = Converter(units, draft);
-    if (!convert) {
-      return;
-    }
-    Object.values(draft.sliders).forEach(slider => {
-      if (slider.units !== baseUnits) {
-        return;
-      }
-      const rawValue = convert(slider.value);
-      const rawRange = slider.range.map(convert);
+export const methods = {
+  methods: draft => ({
+    reset() {
+      return initialState;
+    },
+    setSliderValue(key, value) {
+      const slider = draft.sliders[key];
       const { raw } = slider;
+      slider.value = value;
+      const rawValue =
+        slider.units === "cm" && draft.rawUnits === "in"
+          ? Math.round(cm2in(value) * 10) / 10
+          : value;
       raw.value = rawValue;
-      raw.range = rawRange;
-      raw.default = convert(slider.default);
-      raw.cleanedValue = cleanValue(rawValue, rawRange);
-      raw.step = convert(slider.step);
-    });
-    draft.rawUnits = units;
-  },
-  update,
-  patchCallback(patches, inversePatches) {
-    console.log(...patches);
-    console.log(...inversePatches);
-  },
-});
+      raw.cleanedValue = rawValue;
+      raw.defaultValue = rawValue;
+      this.updateScene();
+    },
+    resetSlider(key) {
+      this.setSliderValue(key, draft.sliders[key].defaultValue);
+    },
+    setRawSliderValue(key, rawValue) {
+      const slider = draft.sliders[key];
+      const { raw } = slider;
+      raw.value = rawValue === "" ? rawValue : Number(rawValue);
+      const cleanedValue = cleanValue(rawValue, raw.range);
+      const isConvertible =
+        slider.units === baseUnits && draft.rawUnits === "in";
+      if (isNaN(cleanedValue)) {
+        raw.cleanedValue = isConvertible
+          ? cm2in(slider.default)
+          : slider.default;
+        slider.value = slider.default;
+      } else {
+        raw.cleanedValue = cleanedValue;
+        slider.value = isConvertible ? in2cm(cleanedValue) : cleanedValue;
+      }
+      this.updateScene();
+    },
+    setRawResolution(key, rawValue) {
+      const { resolution } = draft;
+      const [min, max] = resolution.range;
+      const value = clamp(Math.round(rawValue), min, max);
+      resolution[key] = isNaN(value) ? resolution.default[key] : value;
+      resolution.raw[key] = rawValue;
+      this.updateScene();
+    },
+    apply(newState) {
+      const { sliders, resolution } = draft;
+      Object.keys(sliders).forEach(key => {
+        const value = newState[key];
+        if (!newState[key]) {
+          return;
+        }
+        this.setSliderValue(key, value);
+      });
+      const { x, y } = newState;
+      if (x) {
+        resolution.x = x;
+      }
+      if (y) {
+        resolution.y = y;
+      }
+      this.updateScene();
+    },
+    align() {
+      this.setSliderValue("viewpoint", draft.aligned);
+    },
+    setRawUnits(units) {
+      const convert = Converter(draft.rawUnits, units);
+      draft.rawUnits = units;
+      Object.entries(draft.sliders).forEach(([key, slider]) => {
+        if (slider.units !== baseUnits) {
+          return;
+        }
+        this.setSliderValue(key, slider.value);
+        const { raw } = slider;
+        const rawRange = raw.range.map(convert);
+        raw.units = units;
+        raw.range = rawRange;
+        raw.default = convert(slider.default);
+        raw.cleanedValue = cleanValue(raw.value, rawRange);
+        raw.step = Math.floor(convert(raw.step) * 10) / 10;
+      });
+    },
+    updateScene() {
+      updateScene(draft);
+      draft.initial = draft === initialState;
+    },
+  }),
+  // patchListener: (patches, inversePatches) => {},
+};
 
 const Slider = ({ defaultValue, range, step, units, ...rest }) => ({
   value: defaultValue,
@@ -115,6 +126,7 @@ const Slider = ({ defaultValue, range, step, units, ...rest }) => ({
     range,
     cleanedValue: defaultValue,
     step,
+    units,
   },
   ...rest,
 });
@@ -135,9 +147,6 @@ const Resolution = ({ x, y }) => ({
 const initialState = produce(
   {
     rawUnits: "cm",
-    // absSize: NaN,
-    // maxAbsSize: NaN,
-    // ratio: NaN,
     sliders: {
       fov: Slider({
         defaultValue: 140,
@@ -189,6 +198,7 @@ const initialState = produce(
         y: 2160,
       }),
       range: [768, 7680],
+      step: 8,
       presets: [
         [1366, 720, "HD"],
         [1920, 1080, "FHD"],
@@ -230,9 +240,11 @@ const initialState = produce(
         value: null,
       },
     },
+    initial: true,
+    aligned: null,
   },
-  update,
+  updateScene,
 );
 
-const initialHash = serialize(initialState);
+// const initialHash = serialize(initialState);
 export const persistedState = unserialize(initialState);
